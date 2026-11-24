@@ -22,7 +22,19 @@ def build_graph(connector_groups: Dict[str, List[str]]) -> Dict[str, List[str]]:
     buildings in the same connector group is connected by an edge (undirected).
     """
     # TODO
-    raise NotImplementedError
+    graph = {}
+
+    for buildings in connector_groups.values():
+        for building in buildings:
+            if building not in graph:
+                graph[building] = []
+
+        for building in buildings:
+            for neighbor in buildings:
+                if building != neighbor and neighbor not in graph[building]:
+                    graph[building].append(neighbor)
+
+    return graph
 
 
 def has_path(graph: Dict[str, List[str]], start: str, target: str, visited: Optional[Set[str]] = None) -> bool:
@@ -32,7 +44,23 @@ def has_path(graph: Dict[str, List[str]], start: str, target: str, visited: Opti
     Must handle start == target, and a fully exhausted search.
     """
     # TODO
-    raise NotImplementedError
+    if start == target:
+        return True
+
+    if start not in graph:
+        return False
+
+    if visited is None:
+        visited = set()
+
+    visited.add(start)
+
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            if has_path(graph, neighbor, target, visited):
+                return True
+
+    return False
 
 
 def bfs_shortest_path(graph: Dict[str, List[str]], start: str, target: str) -> Optional[List[str]]:
@@ -48,7 +76,25 @@ def bfs_shortest_path(graph: Dict[str, List[str]], start: str, target: str) -> O
     # version of the same problem" one, so a loop over an explicit
     # queue is the natural fit here rather than recursion.
     # TODO
-    raise NotImplementedError
+    if start not in graph or target not in graph:
+        return None
+
+    queue = deque([[start]])
+    visited = {start}
+
+    while queue:
+        path = queue.popleft()
+        current = path[-1]
+        if current == target:
+            return path
+
+        for neighbor in graph[current]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                new_path = path + [neighbor]
+                queue.append(new_path)
+
+    return None
 
 
 # ============================== VERIFICATION SUITE ==============================
